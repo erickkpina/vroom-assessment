@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if name %}
+        <h1>Hello {{ name|capitalize }} </h1>
+        <br>
+        <img src="{{ url_for('static', filename='images/Screenshot_9.jpg') }}" alt="idk">
+        <br>
+        <p id="number">Just to see</p>
+    {% else %}
+        <h1>What's your name?</h1>
+        <br>
+        <form method="POST">
+            {{ form.csrf_token }}
+            {{ form.hidden_tag() }}
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+            <br>
+            {{ form.submit(class="btn btn-secondary") }}
+        </form>
+    {% endif %}
+
+{% endblock %}
