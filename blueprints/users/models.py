@@ -9,11 +9,9 @@ class Users(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     name = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
-    favorite_color = db.Column(db.String(120))
     date_added = db.Column(db.DateTime, default=datetime.utcnow)
     password_hash = db.Column(db.String(500))
     posts = db.relationship('Posts', backref='author')
-    about_author = db.Column(db.Text(500), nullable=True)
     profile_pic = db.Column(db.String(500), nullable=True)
 
     @property

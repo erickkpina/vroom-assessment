@@ -11,54 +11,90 @@
 
 <br />
 
-<div class="shadow p-3 mb-5 bg-body rounded">
-    <h2>{{ post.title }}</h2>
-    <small>By: {{ post.author.username }}<br />
-        {{ post.date_posted }}</small> <br /><br />
+<section class="d-flex justify-content-center">
+            <div class="card shadow" style="width: 50rem;">
+                <div class="m-3 d-flex flex-row justify-content-between align-items-center">
+                    <div class="d-flex flex-row align-items-center">
+                        <div>
+                            {% if post.author.profile_pic %}
+                                <img src="{{ url_for('static', filename='images/' + post.author.profile_pic) }}"
+                                     class="rounded-circle" style="width:50px; height: 50px;" alt="">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/default-profile.jpg') }}"
+                                     class="img-fluid rounded-circle" style="width:50px; height: 50px;" alt="">
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="p-2 text-secondary fw-bolder">@{{ post.author.username }}</span>
+                        </div>
 
-    {{ post.content|safe }}<br /><br />
+                    </div>
+                    <div>
+                        {% if post.author_id == current_user.id %}
+                            <a href="{{ url_for('posts.edit_post', id=post.id) }}"
+                               class="link-underline link-underline-opacity-0 text-dark">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
+                                    <path fill-rule="evenodd"
+                                          d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"></path>
+                                </svg>
+                            </a>
 
-    <div class="card mb-3">
-        <div class="row no-gutters">
-            <div class="col-md-2">
-                {% if post.author.profile_pic %}
-                <img src="{{ url_for('static', filename='images/' + post.author.profile_pic)}}" width="150" align="left">
-                {% else %}
-                <img src="{{ url_for('static', filename='images/default_profile_pic.png')}}" width="150" align="left">
-                {% endif %}
-            </div>
-    
-            <div class="col-md-10">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ post.author.name }}
-                    </h5>
-                    <p class="card-text">
-                        {% if post.author.about_author %}
-                        {{ post.author.about_author }}
-                        {% else %}
-                        Author has no about profile yet...
+                            <a href="{{ url_for('posts.delete_post', id=post.id) }}"
+                               class=" btn-sm link-underline-opacity-0 text-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-trash3" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"></path>
+                                </svg>
+                            </a>
                         {% endif %}
-    
-                    </p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <h5 class="card-title">{{ post.title }}</h5>
+                        <p class="card-text text-wrap text-break">{{ post.content }}</p>
+
+                    </div>
+                    <div class="d-flex justify-content-start">
+                        {% if post.post_image %}
+                            <img src="{{ url_for('static', filename='images/' + post.post_image) }}"
+                                 class="img-fluid rounded clickable-image p-3 d-block d-md-none" alt=""
+                                 data-toggle="modal" data-target="#imageModal">
+
+                            <img src="{{ url_for('static', filename='images/' + post.post_image) }}"
+                                 class="img-fluid rounded clickable-image d-none d-md-block w-25 p-3" alt=""
+                                 data-toggle="modal"
+                                 data-target="#imageModal">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex flex-row justify-content-between m-3">
+
+                    <div>
+                        <a href="{{ url_for('posts.posts')}}" class="btn btn-outline-dark btn-sm">Back To Blog</a>
+                    </div>
+
+                    <div>
+                        <span class="p-2 text-secondary fw-medium">{{ post.date_posted.strftime('%d %b, %Y') }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-{% if post.author_id == current_user.id %}
-
-    <a href="{{ url_for('posts.edit_post', id=post.id)}}" class="btn btn-outline-secondary btn-sm">Edit Post</a>
-
-    <a href="{{ url_for('posts.delete_post', id=post.id)}}" class="btn btn-outline-danger btn-sm">Delete Post</a>
-
-{% endif %}
-
-<a href="{{ url_for('posts.posts')}}" class="btn btn-outline-secondary btn-sm">Back To Blog</a>
-
-
-
-
+        </section>
+        {% if post.post_image %}
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img src="{{ url_for('static', filename='images/' + post.post_image) }}"
+                                 class="img-fluid rounded" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <br>
 
 {% endblock %}

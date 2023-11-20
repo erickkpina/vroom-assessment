@@ -17,7 +17,7 @@ posts_blueprint = Blueprint('posts', __name__, template_folder='/templates')
 def posts():
     page = request.args.get("page", 1, type=int)
     posts = Posts.query.order_by(desc(Posts.date_posted)).paginate(
-        page=page, per_page=8
+        page=page, per_page=5
     )
 
     if request.headers.get("Accept") == "application/json":
@@ -27,7 +27,7 @@ def posts():
                 "title": post.title,
                 "content": post.content,
                 "post_image": post.post_image,
-                "date_posted": post.date_posted,
+                "date_posted": post.date_posted.strftime("%Y/%m/%d - %H:%M"),
             }
             for post in posts.items
         ]
@@ -46,7 +46,7 @@ def getPost(id):
                 "title": post.title,
                 "content": post.content,
                 "post_image": post.post_image,
-                "date_posted": post.date_posted,
+                "date_posted": post.date_posted.strftime("%Y/%m/%d - %H:%M"),
             }
             for post in posts.items
         ]
@@ -67,9 +67,10 @@ def add_post():
         if form.validate_on_submit():
             if form.image.data:
                 imageName = secure_filename(str(uuid.uuid4()) + ".jpg")
-                image_path = os.path.join("static/images", imageName)
-                form.image.data.save(image_path)
-                postImage = f"/static/images/{imageName}"
+                form.image.data.save(f"static/images/{imageName}")
+                imagePath = f"/{imageName}"
+
+                postImage = imagePath
             else:
                 flash("Sem imagem")
 
@@ -93,11 +94,11 @@ def add_post():
         return render_template("add_post.html", form=form)
 
 
-@posts_blueprint.route('/posts/edit/<int:id>', methods=['GET', 'POST'])
+@posts_blueprint.route('/posts/edit/<int:id>', methods=['GET', 'POST', 'PUT'])
 @login_required
 def edit_post(id):
     post = Posts.query.get_or_404(id)
-    form = PostForm()
+    form = PostForm(obj=post)
 
     if request.method == "POST":
         if form.validate_on_submit():
@@ -114,6 +115,30 @@ def edit_post(id):
             # db.session.add(post)
             db.session.commit()
             flash("Post Has Been Updated!")
+
+    elif request.method == "PUT":
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'message': 'No data provided'}), 400
+
+        if 'title' in data:
+            post.title = data['title']
+        if 'content' in data:
+            post.content = data['content']
+
+        if 'image' in data:
+            imageName = secure_filename(str(uuid.uuid4()) + ".jpg")
+            data['image'].save(f"static/images/{imageName}")
+            imagePath = f"/{imageName}"
+            post.post_image = imagePath
+
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Post updated successfully'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': 'Error updating post', 'error': str(e)}), 500
     else:
         return render_template("edit_post.html", form=form, post=post)
 
@@ -125,15 +150,12 @@ def edit_post(id):
         return render_template("edit_post.html", form=form, post=post)
 
 
-@posts_blueprint.route('/posts/delete/<int:id>')
+@posts_blueprint.route('/posts/delete/<int:id>', methods=['DELETE'])
 @login_required
 def delete_post(id):
     post_to_delete = Posts.query.get_or_404(id)
 
     try:
-        if post_to_delete.imagePath:
-            if os.path.exists(post_to_delete.imagePath):
-                os.remove(post_to_delete.imagePath)
         db.session.delete(post_to_delete)
         db.session.commit()
 

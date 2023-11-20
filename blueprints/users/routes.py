@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, flash, request, redirect
 from werkzeug.security import generate_password_hash
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
@@ -23,22 +23,21 @@ def add_user():
             hashed_pw = generate_password_hash(
                 form.password_hash.data)
             user = Users(username=form.username.data, name=form.name.data, email=form.email.data,
-                         favorite_color=form.favorite_color.data, password_hash=hashed_pw)
+                         password_hash=hashed_pw)
             db.session.add(user)
             db.session.commit()
         name = form.name.data
         form.name.data = ''
         form.username.data = ''
         form.email.data = ''
-        form.favorite_color.data = ''
         form.password_hash.data = ''
 
         flash("User Added Successfully!")
-    our_users = Users.query.order_by(Users.date_added)
-    return render_template("add_user.html",
-                           form=form,
-                           name=name,
-                           our_users=our_users)
+        return redirect('/login')
+    else:
+        return render_template("add_user.html",
+                               form=form,
+                               name=name)
 
 
 @users_blueprint.route('/dashboard', methods=['GET', 'POST'])
@@ -51,9 +50,7 @@ def dashboard():
     if request.method == "POST":
         userToUpdate.name = request.form['name']
         userToUpdate.email = request.form['email']
-        userToUpdate.favorite_color = request.form['favorite_color']
         userToUpdate.username = request.form['username']
-        userToUpdate.about_author = request.form['about_author']
 
         if form.profile_pic.data:
             imageName = secure_filename(str(uuid.uuid4()) + ".jpg")

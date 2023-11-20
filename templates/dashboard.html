@@ -2,116 +2,100 @@
 
 {% block content %}
 
-{% for message in get_flashed_messages() %}
+    {% for message in get_flashed_messages() %}
 
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
 
-{% endfor %}
+    {% endfor %}
 
-<h2>Dashboard</h2>
-<br />
+    <h2>Profile</h2>
 
-<div class="card">
-    <div class="card-header">
-        {{ current_user.name }}
+    <div>
+        <hr class="flex-grow-1 border border-secondary">
     </div>
-    <div class="card-body">
-        <div class="container">
-            <div class="row">
-                <div class="col-8">
-                    <strong>Name:</strong>
-                    {{ current_user.name }}<br />
-                    
-                    <strong>Username:</strong>
-                    {{ current_user.username }}<br />
-                    
-                    <strong>User Id:</strong>
-                    {{ current_user.id }}<br />
-                    
-                    <strong>Email:</strong>
-                    {{ current_user.email }}<br />
+    <br>
+    <br/>
 
-                    <strong>About Author:</strong>
-                    {{ current_user.about_author }}<br />
+    <div class="card">
+        <div class="card-header">
+            {{ current_user.name }} • <span class="text-secondary fw-medium">@{{ current_user.username }}</span>
+        </div>
+        <div class="card-body">
+            <div class="container">
+                <div class="row flex-column-reverse flex-md-row">
 
-                    <strong>Profile Pic:</strong>
-                    {{ current_user.profile_pic }}<br />
-                    
-                    <strong>Favorite Color:</strong>
-                    {{ current_user.favorite_color }}<br />
-                    
-                    <strong>Date Joined:</strong>
-                    {{ current_user.date_added }}<br />
-                    
-                    
-                    
-                    </p>
-                    <a href="{{ url_for('logout')}}" class="btn btn-secondary btn-sm">Logout</a>
-                    
-                    <a href="{{ url_for('delete', id=current_user.id)}}" class="btn btn-danger btn-sm">Delete</a>
-                </div>
-                <div class="col-4">
-                    {% if current_user.profile_pic %}
-                    
-                        <img src="{{ url_for('static', filename='images/' + current_user.profile_pic)}}" width="200" align="right">
-                    
-                    {% else %}
-                        <img src="{{ url_for('static', filename='images/default-profile.jpg') }}" width="150" align="right" alt="profile-pic" >
-                    {% endif %}
+                    <div class="col-md-8 d-flex flex-column justify-content-around">
+                        <div>
+                            <strong>Name:</strong> {{ current_user.name }}<br>
+                            <strong>Username:</strong> {{ current_user.username }}<br>
+                            <strong>Email:</strong> {{ current_user.email }}<br>
+                            <strong>Date Joined:</strong> {{ current_user.date_added.strftime('%d %b, %Y') }}<br>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('logout') }}" class="btn btn-outline-dark btn-sm">Logout</a>
+                            <a href="{{ url_for('delete', id=current_user.id) }}"
+                               class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {% if current_user.profile_pic %}
+                            <img src="{{ url_for('static', filename='images/' + current_user.profile_pic) }}"
+                                 id="mobileImage" class="img-fluid rounded p-3 d-block d-md-none" alt="">
+                            <img src="{{ url_for('static', filename='images/' + current_user.profile_pic) }}"
+                                 id="desktopImage" class="img-fluid rounded d-none d-md-block w-75" alt="">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/default-profile.jpg') }}"
+                                 id="desktopImage" class="img-fluid rounded d-none d-md-block w-75" alt="">
+                            <img src="{{ url_for('static', filename='images/default-profile.jpg') }}"
+                                 class="img-fluid rounded p-3 d-block d-md-none" alt="">
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<br />
+    <br/>
 
-<div class="card">
-    <div class="card-header">
-        Update Profile
+    <div class="card">
+        <div class="card-body">
+
+            <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                {{ form.name.label(class="form-label") }}
+
+                {{ form.name(class="form-control", value=userToUpdate.name) }}
+                <br/>
+
+                {{ form.username.label(class="form-label") }}
+
+                {{ form.username(class="form-control", value=userToUpdate.username) }}
+                <br/>
+
+                {{ form.email.label(class="form-label") }}
+
+                {{ form.email(class="form-control", value=userToUpdate.email) }}
+                <br/>
+
+                {{ form.profile_pic.label(class="form-label") }}
+
+                {{ form.profile_pic(class="form-control", value=userToUpdate.profile_pic) }}
+
+                <br/>
+                <div class="d-flex justify-content-center">
+                    {{ form.submit(class="btn btn-outline-dark btn-sm") }}
+                </div>
+                <br>
+            </form>
+        </div>
     </div>
-    <div class="card-body">
-
-        <form action="/dashboard" method="POST" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-
-            {{ form.name.label(class="form-label") }}
-
-            {{ form.name(class="form-control", value=userToUpdate.name) }}
-            <br />
-
-            {{ form.username.label(class="form-label") }}
-
-            {{ form.username(class="form-control", value=userToUpdate.username) }}
-            <br />
-
-            {{ form.email.label(class="form-label") }}
-
-            {{ form.email(class="form-control", value=userToUpdate.email) }}
-            <br />
-
-            {{ form.favorite_color.label(class="form-label") }}
-
-            {{ form.favorite_color(class="form-control", value=userToUpdate.favorite_color) }}
-            <br />
-            
-            {{ form.about_author.label(class="form-label") }}
-            
-            <textarea name="about_author" class="form-control">{{ userToUpdate.about_author }}</textarea>
-        
-            <br />
-
-            {{ form.profile_pic.label(class="form-label") }}
-            
-            {{ form.profile_pic(class="form-control", value=userToUpdate.profile_pic) }}
-
-            {{ form.submit(class="btn btn-secondary btn-sm") }}
-        </form>
-    </div>
-</div>
+    <br>
+    <br>
 
 {% endblock %}

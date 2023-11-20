@@ -17,7 +17,8 @@ from api import api_blueprint
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/vroom'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/vroom'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 app.config['SECRET_KEY'] = "my super secret key that no one is supposed to know"
 
 
@@ -46,10 +47,9 @@ def login():
     if form.validate_on_submit():
         user = Users.query.filter_by(username=form.username.data).first()
         if user:
-            # Check the hash
             if check_password_hash(user.password_hash, form.password.data):
                 login_user(user)
-                flash("Login Succesfull!!")
+                flash("Login Succesfull")
                 return redirect(url_for('dashboard'))
             else:
                 flash("Wrong Password - Try Again!")
@@ -76,7 +76,6 @@ def add_user():
         form.name.data = ''
         form.username.data = ''
         form.email.data = ''
-        form.favorite_color.data = ''
         form.password_hash.data = ''
 
         flash("User Added Successfully!")

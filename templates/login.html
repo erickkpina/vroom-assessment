@@ -2,45 +2,49 @@
 
 {% block content %}
 
-{% for message in get_flashed_messages() %}
+    {% for message in get_flashed_messages() %}
 
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
-
-{% endfor %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
 
-
-<h1>Login!</h1>
-<br /><br />
+    {% endfor %}
 
 
 
-<div class="shadow p-3 mb-5 bg-body rounded">
-    <form method="POST">
-        {{ form.hidden_tag() }}
-
-        {{ form.username.label(class="form-label") }}
-
-        {{ form.username(class="form-control") }}
-        <br />
-
-        {{ form.password.label(class="form-label") }}
-
-        {{ form.password(class="form-control") }}
-        <br />
+    <h1>Login</h1>
+    <div>
+        <hr class="flex-grow-1 border border-secondary">
+    </div>
+    <br>
+    <br/>
 
 
-        <br />
 
-        {{ form.submit(class="btn btn-secondary") }}
+    <div class="shadow p-3 mb-5 bg-body rounded">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            {{ form.username.label(class="form-label") }}
+
+            {{ form.username(class="form-control") }}
+            <br/>
+
+            {{ form.password.label(class="form-label") }}
+
+            {{ form.password(class="form-control") }}
+            <br/>
 
 
-    </form>
-</div>
+            <br/>
+
+            {{ form.submit(class="btn btn-secondary") }}
+
+
+        </form>
+    </div>
 
 
 {% endblock %}
